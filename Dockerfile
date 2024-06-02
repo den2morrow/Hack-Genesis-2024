@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Открываем порт, если это необходимо для вашего приложения (например, для веб-сервера)
-# EXPOSE 8000
+EXPOSE 8000
 
 # Команда для запуска вашего скрипта при запуске контейнера
 CMD ["python", "scripts/yandex_llm.py"]
