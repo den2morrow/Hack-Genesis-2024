@@ -126,8 +126,8 @@ def text_from_pdf(pdf_path: str) -> dict[str: list]:
     pdfFileObj.close()
 
     # Удаляем созданные дополнительные файлы
-    os.remove('./tmp/cropped_image.pdf')
-    os.remove('./tmp/PDF_image.png')
+    os.remove('../tmp/cropped_image.pdf')
+    os.remove('../tmp/PDF_image.png')
 
     # Возвращаем весь словарь файла text_per_page
     return text_per_page
@@ -161,7 +161,7 @@ def _text_extraction(element: list[LTItemT]) -> tuple[str, list[str]]:
 
 ### Текст из картинки
 # Создаём функцию для вырезания элементов изображений из PDF
-def _crop_image(element, pageObj, path_output_with_name: str ='./tmp/cropped_image'):
+def _crop_image(element, pageObj, path_output_with_name: str ='../tmp/cropped_image'):
     # Получаем координаты для вырезания изображения из PDF
     [image_left, image_top, image_right, image_bottom] = [element.x0,element.y0,element.x1,element.y1] 
     # Обрезаем страницу по координатам (left, bottom, right, top)
@@ -177,7 +177,7 @@ def _crop_image(element, pageObj, path_output_with_name: str ='./tmp/cropped_ima
 
 
 # Создаём функцию для преобразования PDF в изображения
-def _convert_to_images(input_file: str, path_output_with_name: str ='./tmp/PDF_image'):
+def _convert_to_images(input_file: str, path_output_with_name: str ='../tmp/PDF_image'):
     poppler_path = r"C:\poppler-24.02.0\Library\bin"
     images = convert_from_path(input_file, poppler_path=poppler_path)
     image = images[0]
@@ -224,15 +224,15 @@ def _table_converter(table: list[list[list[str | None]]]) -> str:
 
 
 def create_txt_files():
-    pdfs_path = './files/pdfs' 
-    txts_path = './files/txts'
+    pdfs_path = '../files/pdfs/all_docs' 
+    txts_path = '../files/txts'
     for pdf_file_path in tqdm(os.listdir(pdfs_path), 'Files', position=0):
         pdf_path = f'{pdfs_path}/{pdf_file_path}'
         txt_path = txts_path + f"/{pdf_file_path[:pdf_file_path.rfind('.pdf')]}.txt"
 
         dict_with_text = text_from_pdf(pdf_path=pdf_path)
         page_numbers = [key for key in dict_with_text.keys()]
-        with open(txt_path, "a", encoding='utf-8') as file:
+        with open(txt_path, "w", encoding='utf-8') as file:
             for page in tqdm(page_numbers, 'Pages', position=1, leave=False):
                 result = ''.join(dict_with_text[page][4]) + '\n\n'  # + f"\n{'-'*100}\n"
                 file.write(result)
