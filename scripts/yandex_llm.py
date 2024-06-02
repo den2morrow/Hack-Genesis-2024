@@ -2,9 +2,9 @@ import os
 from tqdm import tqdm
 from dotenv import load_dotenv
 from yandex_chain import YandexLLM, YandexEmbeddings
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import TextLoader
-from langchain_community.document_loaders.pdf import UnstructuredPDFLoader
+from langchain_community.document_loaders.pdf import PDFMinerLoader
 from langchain_text_splitters import CharacterTextSplitter, RecursiveCharacterTextSplitter
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.output_parser import StrOutputParser
@@ -34,9 +34,9 @@ def create_embeddings_with_pdf(folder_path: str, index_name: str) -> FAISS:
     embeddings = YandexEmbeddings(folder_id=os.getenv('FOLDER_ID'), api_key=os.getenv('YANDEX_API_KEY'))
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
 
-    for path in tqdm(os.listdir('../files/all_docs')):
-        pdf_path = '../files/all_docs/'+path
-        loader = UnstructuredPDFLoader(pdf_path)
+    for path in tqdm(os.listdir('../files/pdfs/all_docs')):
+        pdf_path = '../files/pdfs/all_docs/'+path
+        loader = PDFMinerLoader(pdf_path)
         document = loader.load()
         doc = text_splitter.split_documents(document)
         db = FAISS.from_documents(doc, embedding=embeddings)  # .from_documents(doc, embeddings)
@@ -52,16 +52,14 @@ def load_embeddings(folder_path: str, index_name: str) -> FAISS:
     return db
 
 
-def main():
+def rag_system(query: str, db_folder_path: str, db_index_name: str):
     print(" + Индексируем документы")
-    # db = create_embeddings_with_text('../files/dbs/db1_text', index_name='finance_docs')
-    # db = create_embeddings_with_pdf('../files/dbs/db1_pdf', index_name='finance_docs')
-    db =  load_embeddings('../files/dbs/db1_text', index_name='finance_docs')
+    # db = create_embeddings_with_text('../files/dbs/db1_text', index_name='finance_docs') Создаем базу данных, если ее нет
+    # db = create_embeddings_with_pdf('../files/dbs/db1_pdf', index_name='finance_docs') Второй варинант создания без custom pdf_parser
+    db =  load_embeddings(folder_path=db_folder_path, index_name=db_index_name)
     retriever = db.as_retriever()
 
-    query = "На сколько снизится экономика в 2023 году?"
     print(f"+ Запрос: {query}")
-
     print(" + Получение релевантных документов")
     retriever = db.as_retriever()
 
@@ -84,6 +82,16 @@ def main():
     print(" + Запуск LLM Chain")
     res = chain.invoke(query)
     print(f" + Ответ: {res}")
+
+
+
+
+def main():
+    while True:
+        query = input('Введите ваш запрос (или q для выхода): ')
+        if query == 'q': break
+        rag_system(query=query, db_folder_path='../files/dbs/db1_text', db_index_name='finance_docs')
+        print('\n\n' + 100*'=' + '\n\n')
 
 
 if __name__ == "__main__":
