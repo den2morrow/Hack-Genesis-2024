@@ -54,9 +54,9 @@ def load_embeddings(folder_path: str, index_name: str) -> FAISS:
 
 def main():
     print(" + Индексируем документы")
-    # db = create_embeddings_with_text('../files/db1_text/', index_name='finance_docs')
-    # db = create_embeddings_with_pdf('../files/db1_pdf/', index_name='finance_docs')
-    db =  load_embeddings('../files/db/', index_name='finance_docs')
+    # db = create_embeddings_with_text('../files/dbs/db1_text', index_name='finance_docs')
+    # db = create_embeddings_with_pdf('../files/dbs/db1_pdf', index_name='finance_docs')
+    db =  load_embeddings('../files/dbs/db1_text', index_name='finance_docs')
     retriever = db.as_retriever()
 
     query = "На сколько снизится экономика в 2023 году?"
