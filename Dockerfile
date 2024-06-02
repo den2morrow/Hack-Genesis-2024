@@ -1,5 +1,5 @@
 # Используем образ Python 3.10 из зеркала Google Container Registry
-FROM mirror.gcr.io/library/python:3.10-slim
+FROM dockerhub.timeweb.cloud/library/python:3.10-slim
 
 # Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
